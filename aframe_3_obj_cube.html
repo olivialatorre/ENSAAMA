@@ -1,0 +1,25 @@
+
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+        <a-assets>
+            <a-asset-item id="obj-cat" src="/assets/3Dmodels/exp1_obj_lowpolycat/cat.obj"></a-asset-item>
+            <a-asset-item id="tree-obj" src="/assets/3Dmodels/exp2_obj_lowpoly_tree/Lowpoly_tree_sample.obj"></a-asset-item>
+            <a-asset-item id="tree-mtl" src="/assets/3Dmodels/exp2_obj_lowpoly_tree/Lowpoly_tree_sample.mtl"></a-asset-item>
+        </a-assets>
+
+        <a-entity id="arbre" position="0 0 -3"  
+         obj-model="obj: #tree-obj; mtl: #tree-mtl">
+        </a-entity
+            position="0 0 -3"  scale="0.01 0.01 0.01"  
+         obj-model="obj: #obj-cat";>
+        <a-entity>
+
+        </a-entity>
+        <a-sky> </a-sky>
+    </a-scene>
+  </body>
+</html>
