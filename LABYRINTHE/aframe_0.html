@@ -4,181 +4,70 @@
     <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-extras@7.4.0/dist/aframe-extras.min.js"></script>
   </head>
   <body>
-    <a-scene
-      keyboard-shortcuts=""
-      screenshot=""
-      xr-mode-ui=""
-      device-orientation-permission-ui=""
-    >
+    <a-scene keyboard-shortcuts="" screenshot="" xr-mode-ui="" device-orientation-permission-ui="">
       <a-assets>
-        <img id="texture" src="./pluie2.jpg" />
 
-        <img
-          id="earth_atmos_4096"
-          src="https://aframe.io/sample-assets/assets/images/space/earth_atmos_4096.jpg"
-          crossorigin="anonymous" /><img
-          id="lensflare0"
-          src="https://aframe.io/sample-assets/assets/images/particles/lensflare_rome/lensflare0.png"
-          crossorigin="anonymous" /><img
-          id="lensflare3"
-          src="https://aframe.io/sample-assets/assets/images/particles/lensflare_rome/lensflare3.png"
-          crossorigin="anonymous" /><img
-          id="water"
-          src="https://aframe.io/sample-assets/assets/images/noise/water.jpg"
-          crossorigin="anonymous" /><img
-          id="metal"
-          src="https://aframe.io/sample-assets/assets/images/reflection/metal.jpg"
-          crossorigin="anonymous" /><img
-          id="perlin512"
-          src="https://aframe.io/sample-assets/assets/images/noise/perlin-512.png"
-          crossorigin="anonymous"
-      /></a-assets>
+        <img id="texture" src="./pluie2.jpg">
 
-      <a-entity
-        camera
-        look-controls
-        wasd-controls="acceleration:20"
-        dynamic-body="shape: sphere; sphereRadius: 0.3"
-        position="0 1.6 0"
-      ></a-entity>
+        <img id="earth_atmos_4096" src="https://aframe.io/sample-assets/assets/images/space/earth_atmos_4096.jpg" crossorigin="anonymous">
+        <img id="lensflare0" src="https://aframe.io/sample-assets/assets/images/particles/lensflare_rome/lensflare0.png" crossorigin="anonymous">
+        <img id="lensflare3" src="https://aframe.io/sample-assets/assets/images/particles/lensflare_rome/lensflare3.png" crossorigin="anonymous">
+        <img id="water" src="https://aframe.io/sample-assets/assets/images/noise/water.jpg" crossorigin="anonymous">
+        <img id="metal" src="https://aframe.io/sample-assets/assets/images/reflection/metal.jpg" crossorigin="anonymous">
+        <img id="perlin512" src="https://aframe.io/sample-assets/assets/images/noise/perlin-512.png" crossorigin="anonymous">
+    
+    </a-assets>
+
+      <a-entity camera="" look-controls="" wasd-controls="acceleration: 20" dynamic-body="shape: sphere; sphereRadius: 0.3" position="0 1 0" rotation="0 0 0">
+      </a-entity>
 
       <!-- mur exterieurs-->
-      <a-box
-        src="#texture"
-        position="2 2.01 -3.002"
-        rotation="0 90 0"
-        geometry="depth: 0.1; height: 4; width: 4"
-      ></a-box>
-      <a-box
-        src="#texture"
-        position="2 -2.035 -3.001"
-        rotation="0 90 180"
-        geometry="depth: 0.1; height: 4; width: 4"
-        material="opacity: 0.7"
-      ></a-box>
-      <a-box
-        src="#texture"
-        position="-2 2 -3.011"
-        rotation="0 90 0"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 4"
-        material="opacity: 0.85; color: #ffffff"
-      ></a-box>
-      <a-box
-        src="#texture"
-        position="0 2 -4.959"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 4"
-        material="opacity: 0.85; color: #ffffff"
-      ></a-box>
 
-      <a-box
-        src="#texture"
-        position="-2 -2.025 -2.988"
-        rotation="0 90 180"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 4"
-        material="opacity: 0.41; color: #ffffff"
-      ></a-box>
-      <a-box
-        src="#texture"
-        position="0 -2.052 -4.949"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 4"
-        material="opacity: 0.41; color: #ffffff"
-        rotation="0 0 180"
-      ></a-box>
+      <a-box src="#texture" position="2 2 -3" rotation="0 90 0" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.91"></a-box>
+
+      <a-box src="#texture" position="2 -2 -3" rotation="0 90 180" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.33"></a-box>
+      <a-box src="#texture" position="2 -2 -3" rotation="0 90 180" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.45"></a-box>
+
+      <a-box src="#texture" position="-2 2 -3" rotation="0 90 0" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.87; color: #ffffff"></a-box>
+      <a-box src="#texture" position="0 2 -5" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.62; color: #ffffff"></a-box>
+
+      <a-box src="#texture" position="-2 -2 -3" rotation="0 90 180" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.25; color: #ffffff"></a-box>
+      <a-box src="#texture" position="-2 -2 -3" rotation="0 90 180" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.45; color: #ffffff"></a-box>
+
+      <a-box src="#texture" position="0 -2 -5" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 4" material="opacity: 0.24; color: #ffffff" rotation="0 0 180"></a-box>
 
       <!-- mur interieurs-->
-      <a-box
-        material="shader: flat; src: #perlin512"
-        position="0 1.599 -2.332"
-        rotation="29.999999999999996 29.999999999999996 29.999999999999996"
-        static-body
-      ></a-box
-      ><a-box
-        material="opacity: 0.38; shader: flat; src: #perlin512"
-        position="0 -1.102 -2.41"
-        rotation="-29.999999999999996 -29.999999999999996 -29.999999999999996"
-      ></a-box>
-      <a-box
-        position="-1 1.924 -2.513"
-        rotation="0 90 0"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 3"
-        material="blending: none; color: #000000; src: #metal"
-      ></a-box
-      ><a-box
-        position="-1 -2.044 -2.517"
-        rotation="0 90 0"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 3"
-        material="blending: none; color: #000000; src: #metal"
-      ></a-box>
 
-      <a-box
-        position="0 1.964 -1.065"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 2"
-        material="opacity: 0.76; blending: multiply; color: #FFF; roughness: 0; src: #texture"
-      ></a-box
-      ><a-box
-        position="0 -2.064 -1.052"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 2"
-        material="opacity: 0.76; blending: multiply; color: #FFF; roughness: 0; src: #texture"
-        rotation="0 0 180"
-      ></a-box>
+      <a-box material="shader: flat; src: #perlin512" position="0 1.6 -2.3" rotation="30 30 30" static-body="" id="colorbox"></a-box>
+      <a-box material="opacity: 0.31; shader: flat; src: #perlin512" position="0 -1.6 -2.4" rotation="-30 -86.5 -30" id="colorbox.reflection"></a-box>
+      
+      <a-box position="-1 2 -2.5" rotation="0 90 0" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 3" material="blending: none; color: #000000; src: #metal"></a-box>
+      <a-box position="-1 -2 -2.5" rotation="0 90 0" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 3" material="opacity: 0.52; color: #000000; src: #metal"></a-box>
 
-      <a-box
-        position="1 1.973 -2.504"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 3.01"
-        material="blending: none; color: #000000"
-        rotation="0 90 0"
-      ></a-box
-      ><a-box
-        position="1 -2.012 -2.501"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 3.01"
-        material="blending: none; color: #000000"
-        rotation="0 90 0"
-      ></a-box
-      ><a-box
-        position="0.691 1.967 -3.865"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 0.75"
-        material="blending: none; color: #000000; src: #metal"
-        rotation="0 29.999999999999996 0"
-      ></a-box
-      ><a-box
-        position="0.684 -1.977 -3.86"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 0.75"
-        material="blending: none; color: #000000; src: #metal"
-        rotation="0 29.999999999999996 0"
-      ></a-box
-      ><a-box
-        position="-0.706 1.947 -3.887"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 0.75"
-        material="blending: none; color: #000000; src: #metal"
-        rotation="0 -29.999999999999996 0"
-      ></a-box
-      ><a-box
-        position="-0.722 -1.989 -3.88"
-        color="#4CC3D9"
-        geometry="depth: 0.1; height: 4; width: 0.75"
-        material="blending: none; color: #000000; src: #metal"
-        rotation="0 -29.999999999999996 0"
-      ></a-box>
+      <a-box position="0 2 -1" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 2" material="opacity: 0.85; blending: multiply; color: #FFF; roughness: 0; src: #texture"></a-box>
+      <a-box position="0 -2 -0.999" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 2" material="opacity: 0.66; blending: multiply; color: #FFF; roughness: 0; src: #texture" rotation="0 0 180"></a-box>
 
-      <a-sky src="#texture" color="black" material="src: "></a-sky
-      ><a-sky
-        src="#texture"
-        color="black"
-        material="shader: portal; strokeColor: #232323"
-      ></a-sky>
+      <a-box position="1 2 -2.5" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 3.01" material="blending: none; color: #000000" rotation="0 90 0"></a-box>
+      <a-box position="1 -2 -2.5" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 3.01" material="opacity: 0.52; color: #000000" rotation="0 90 0"></a-box>
+      <a-box position="0.7 2 -3.8" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 0.75" material="blending: none; color: #000000; src: #metal" rotation="0 30 0"></a-box>
+      <a-box position="0.7 -2 -3.8" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 0.75" material="opacity: 0.54; color: #000000; src: #metal" rotation="0 30 0"></a-box>
+      <a-box position="-0.7 2 -3.8" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 0.75" material="blending: none; color: #000000; src: #metal" rotation="0 -30 0"></a-box>
+      <a-box position="-0.7 -2 -3.8" color="#4CC3D9" geometry="depth: 0.1; height: 4; width: 0.75" material="opacity: 0.51; color: #000000; src: #metal" rotation="0 -30 0"></a-box>
+
+
+      <!-- ciel -->
+
+      <a-sky src="#texture" color="black" material="src: "></a-sky>
+
+
+      <a-entity light="intensity: 0.664; castShadow: true" position="0.044 0.202 6.015" data-aframe-default-light="" aframe-injected=""></a-entity>
+      <a-entity light="color: #7ba3fc; intensity: 1.43; type: ambient" data-aframe-default-light="" aframe-injected="" position="0.158 0.883 8.58"></a-entity>
+      <a-entity light="color: #53d5fd; intensity: 0.154; castShadow: true" position="-0.049 1 8.69" data-aframe-default-light="" aframe-injected=""></a-entity>
+      <a-entity light="color: #53d5fd; intensity: 0.014; castShadow: true" position="0.191 0.62 8.45" data-aframe-default-light="" aframe-injected=""></a-entity>
+      <a-entity light="color: #ffaa00; intensity: 0.124; castShadow: true" position="-0.348 0.645 8.69" data-aframe-default-light="" aframe-injected=""></a-entity>
+
     </a-scene>
   </body>
 </html>
+
+
