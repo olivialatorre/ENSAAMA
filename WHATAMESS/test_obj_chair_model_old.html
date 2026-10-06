@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="./debug.js"></script>
+    <script src="./effects-model.js"></script>
+</head>
+
+<body>
+
+    <a-scene background="color: skyblue" 
+        debug-keyboard="key: e, r, t, y, u, i ; 
+            event: wireframe, transparent, desappear, delete, bluescreen, reboot; 
+            target: #chair, #chair, #chair, #chair, #chair, #chair">
+        <a-assets>
+            <a-asset-item id="model-obj" src="./assets/3D_models/obj_chair/Wooden_Chair.obj"></a-asset-item>
+            <a-asset-item id="model-mtl" src="./assets/3D_models/obj_chair/Wooden_Chair.mtl"></a-asset-item>
+        </a-assets>
+
+        <a-entity id="chair" obj-model="obj: #model-obj; mtl: #model-mtl" 
+            model-wireframe 
+            model-transparent="opacity: 0.2" 
+            model-desappear="opacity: 0.1; duration: 3000"
+            model-delete
+            model-bluescreen="color: blue; duration: 200"
+            model-reboot="duration: 2000;frequency: 8; slowdown: false"
+            position="0 0 -5" scale="0.02 0.02 0.02"></a-entity>
+
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="silver"></a-plane>    
+    </a-scene>
+
+</body>
+
+</html>

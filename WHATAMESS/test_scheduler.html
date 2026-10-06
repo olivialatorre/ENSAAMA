@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <!-- <script src="./debug.js"></script> -->
+    <script src="https://ensaama-officiel-numerique.github.io/components/debug/debug.js"></script>
+    <!-- <script src="./effects-model.js"></script>
+    <script src="./effects-vertices.js"></script>
+    <script src="./scheduler.js"></script> -->
+    <script src="https://ensaama-officiel-numerique.github.io/components/effects/test3_notoggle/effects-model.js"></script>    
+    <script src="https://ensaama-officiel-numerique.github.io/components/effects/test3_notoggle/effects-vertices.js"></script>
+    <script src="https://ensaama-officiel-numerique.github.io/components/effects/test3_notoggle/scheduler.js"></script>
+    
+</head>
+
+<body>
+
+    <!-- scénario JSON : lu par le composant scheduler via config: #scenario
+         chair1 = effets "modèle" (wireframe cumulatif, transparent cumulatif,
+                   desappear idempotent, reboot cumulatif->destructif en random)
+         chair2 = effets "vertices" (corrupt cumulatif, binary-rain idempotent/autonome,
+                   erosion cumulatif->destructif, glitch idempotent en random) -->
+    <script type="application/json" id="scenario">
+    {
+        "timeline": [
+            { "time": 0,     "target": "#chair1", "event": "wireframe" },
+            { "time": 5000,  "target": "#chair2", "event": "vertices" },
+            { "time": 10000, "target": "#chair1", "event": "wireframe" },
+            { "time": 15000, "target": "#chair1", "event": "transparent" },
+            { "time": 20000, "target": "#chair2", "event": "vertices-corrupt" },
+            { "time": 30000, "target": "#chair1", "event": "transparent" },
+            { "time": 32000, "target": "#chair2", "event": "vertices-corrupt" },
+            { "time": 38000, "target": "#chair1", "event": "desappear" },
+            { "time": 42000, "target": "#chair2", "event": "vertices-binary-rain" },
+            { "time": 50000, "target": "#chair2", "event": "vertices-erosion" }
+        ],
+        "random": [
+            { "target": "#chair1", "events": ["reboot"],          "interval": 15000, "jitter": 0.3 },
+            { "target": "#chair2", "events": ["vertices-glitch"], "interval": 8000,  "jitter": 0.5 }
+        ]
+    }
+    </script>
+
+    <a-scene background="color: skyblue"
+        debug-keyboard="key: p, o, l, m ;
+            event: start, stop, pause, resume ;
+            target: #director, #director, #director, #director">
+
+        <a-assets>
+            <a-asset-item id="model-obj" src="./assets/3D_models/obj_chair/Wooden_Chair.obj"></a-asset-item>
+            <a-asset-item id="model-mtl" src="./assets/3D_models/obj_chair/Wooden_Chair.mtl"></a-asset-item>
+        </a-assets>
+
+        <!-- entité "chef d'orchestre" : ne porte pas de modèle, juste le scheduler.
+             autostart: false -> ici on garde le démarrage manuel (touche p) pour les tests ;
+             le composant démarre automatiquement par défaut (autostart: true), ce flag permet de choisir. -->
+        <a-entity id="director"
+            scheduler="config: #scenario; duration: 60000; loop: false; autostart: false">
+        </a-entity>
+
+        <!-- chair0 : chaise témoin à sa position d'origine, non ciblée par le scénario.
+             pilotable manuellement au clavier (touches e/r/t/y/u/i), indépendamment du scheduler,
+             pour tester un effet isolément sans attendre son tour dans la timeline. -->
+        <a-entity id="chair0" obj-model="obj: #model-obj; mtl: #model-mtl"
+            debug-keyboard__manual="key: e, r, t, y, u, i ;
+                event: wireframe, transparent, desappear, delete, bluescreen, reboot ;
+                target: #chair0, #chair0, #chair0, #chair0, #chair0, #chair0"
+            model-wireframe
+            model-transparent="step: 0.2; min: 0.05"
+            model-desappear="opacity: 0.1; duration: 3000"
+            model-bluescreen="color: blue; duration: 200"
+            model-reboot="duration: 2000; frequency: 8; slowdown: true; attempts: 2"
+            model-delete
+            vertices="color: white; radius: 1; opacity: 0.15; ratio: 0.03"
+            vertices-corrupt="percentage: 0.15; amplitude: 20"
+            vertices-glitch="amplitude: 1; duration: 1000; frequency: 60"
+            vertices-erosion="duration: 5000; percentage: 1.0; jitter: 0.3"
+            vertices-binary-rain="ratio: 0.03; size: 20; color: #00ff00; distance: 20; duration: 1500; lifetime: 6000"
+            position="0 0 -5" scale="0.02 0.02 0.02"></a-entity>
+
+        <!-- chair1 : cible des effets "modèle" -->
+        <a-entity id="chair1" obj-model="obj: #model-obj; mtl: #model-mtl"
+            model-wireframe
+            model-transparent="step: 0.25; min: 0.05"
+            model-desappear="opacity: 0.1; duration: 2000"
+            model-reboot="duration: 1500; frequency: 8; slowdown: true; attempts: 3"
+            position="-2 0 -3" scale="0.02 0.02 0.02"></a-entity>
+
+        <!-- chair2 : cible des effets "vertices" -->
+        <a-entity id="chair2" obj-model="obj: #model-obj; mtl: #model-mtl"
+            vertices="color: white; radius: 1; opacity: 0.15; ratio: 0.03"
+            vertices-corrupt="percentage: 0.15; amplitude: 20"
+            vertices-glitch="amplitude: 1; duration: 1000; frequency: 60"
+            vertices-binary-rain="ratio: 0.05; size: 20; color: #00ff00; distance: 20; duration: 1500; lifetime: 6000"
+            vertices-erosion="duration: 6000; percentage: 1.0; jitter: 0.3"
+            position="2 0 -3" scale="0.02 0.02 0.02"></a-entity>
+
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="6" height="4" color="silver"></a-plane>
+    </a-scene>
+
+    <!-- touches director : p = start, o = stop, l = pause, m = resume
+         touches chair0 (test manuel, indépendant du scheduler) :
+         e = wireframe, r = transparent, t = desappear, y = delete, u = bluescreen, i = reboot -->
+
+</body>
+
+</html>
