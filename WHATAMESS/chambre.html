@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>WHATAMES_Olivia</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <script>
+  AFRAME.registerComponent('glitch-clone', {
+    schema: {
+      interval: { default: 100 },
+      max: { default: 10 },
+      offset: { type: 'vec3', default: { x: 0.5, y: 0, z: 0.05 } },
+      active: { default: false }
+    },
+    init: function () {
+      this.clones = [];
+      this.t = 0;
+      this.count = 0;
+    },
+    tick: function (time, dt) {
+      if (!this.data.active || this.count >= this.data.max) return;
+      this.t += dt;
+      if (this.t < this.data.interval) return;
+      this.t = 0;
+      this.count++;
+      const clone = this.el.cloneNode(true);
+      clone.removeAttribute('glitch-clone');
+      clone.removeAttribute('id');
+      const p = this.el.object3D.position;
+      clone.setAttribute('position', {
+        x: p.x + this.data.offset.x * this.count,
+        y: p.y + this.data.offset.y * this.count,
+        z: p.z + this.data.offset.z * this.count
+      });
+      this.el.parentNode.appendChild(clone);
+      this.clones.push(clone);
+    },
+    remove: function () {
+      this.clones.forEach(c => c.parentNode && c.parentNode.removeChild(c));
+    }
+  });
+  
+  AFRAME.registerComponent('glitch-clone2', {
+    schema: {
+      interval: { default: 100 },
+      max: { default: 6 },
+      offset: { type: 'vec3', default: { x: 0, y: 0.6, z: 0.05 } },
+      active: { default: false }
+    },
+    init: function () {
+      this.clones = [];
+      this.t = 0;
+      this.count = 0;
+    },
+    tick: function (time, dt) {
+      if (!this.data.active || this.count >= this.data.max) return;
+      this.t += dt;
+      if (this.t < this.data.interval) return;
+      this.t = 0;
+      this.count++;
+      const clone = this.el.cloneNode(true);
+      clone.removeAttribute('glitch-clone');
+      clone.removeAttribute('id');
+      const p = this.el.object3D.position;
+      clone.setAttribute('position', {
+        x: p.x + this.data.offset.x * this.count,
+        y: p.y + this.data.offset.y * this.count,
+        z: p.z + this.data.offset.z * this.count
+      });
+      this.el.parentNode.appendChild(clone);
+      this.clones.push(clone);
+    },
+    remove: function () {
+      this.clones.forEach(c => c.parentNode && c.parentNode.removeChild(c));
+    }
+  });
+
+  AFRAME.registerComponent('glitch-clone3', {
+    schema: {
+      interval: { default: 140 },
+      max: { default: 3 },
+      offset: { type: 'vec3', default: { x: 0, y: -0.6, z: 0.6 } },
+      active: { default: false }
+    },
+    init: function () {
+      this.clones = [];
+      this.t = 0;
+      this.count = 0;
+    },
+    tick: function (time, dt) {
+      if (!this.data.active || this.count >= this.data.max) return;
+      this.t += dt;
+      if (this.t < this.data.interval) return;
+      this.t = 0;
+      this.count++;
+      const clone = this.el.cloneNode(true);
+      clone.removeAttribute('glitch-clone');
+      clone.removeAttribute('id');
+      const p = this.el.object3D.position;
+      clone.setAttribute('position', {
+        x: p.x + this.data.offset.x * this.count,
+        y: p.y + this.data.offset.y * this.count,
+        z: p.z + this.data.offset.z * this.count
+      });
+      this.el.parentNode.appendChild(clone);
+      this.clones.push(clone);
+    },
+    remove: function () {
+      this.clones.forEach(c => c.parentNode && c.parentNode.removeChild(c));
+    }
+  });
+
+  AFRAME.registerComponent('flicker', {
+    schema: { active: { default: false }, base: { default: 0.5 } },
+    tick: function () {
+      if (!this.data.active) return;
+      const v = Math.random() > 0.8 ? 0.1 : this.data.base;
+      this.el.setAttribute('light', 'intensity', v);
+    }
+  });
+
+  AFRAME.registerComponent('poster-flicker', {
+  schema: {
+    duration:      { default: 30000 },  // durée totale de l'effet (ms)
+    startInterval: { default: 900 },    // ms entre deux changements au début
+    endInterval:   { default: 30 }      // ms entre deux changements à la fin
+  },
+  init: function () {
+    this.elapsed = 0;
+    this.t = 0;
+    this.posters = [];
+    this.el.querySelectorAll('[src]').forEach((el) => {
+      const mesh = el.getObject3D('mesh');
+      if (!mesh) return;
+      const mat = mesh.material;
+      this.posters.push({ mat: mat, map: mat.map });  // on garde l'image d'origine
+      mat.map = null;                                  // plus d'image : couleur unie
+      mat.needsUpdate = true;
+    });
+    this.recolor();
+  },
+  recolor: function () {
+    this.posters.forEach((p) => p.mat.color.setHSL(Math.random(), 1, 0.5));
+  },
+  tick: function (time, dt) {
+    this.elapsed += dt;
+    this.t += dt;
+    const k = Math.min(this.elapsed / this.data.duration, 1);   // 0 → 1 au fil de l'effet
+    const interval = this.data.startInterval + (this.data.endInterval - this.data.startInterval) * k;
+    if (this.t < interval) return;
+    this.t = 0;
+    this.recolor();   // chaque poster reçoit sa propre couleur au hasard
+  },
+  remove: function () {
+    // on remet les images et la couleur normale
+    this.posters.forEach((p) => {
+      p.mat.map = p.map;
+      p.mat.color.set('#ffffff');
+      p.mat.needsUpdate = true;
+    });
+  }
+});
+
+AFRAME.registerComponent('color-flicker', {
+  schema: {
+    duration:      { default: 25000 },
+    startInterval: { default: 700 },
+    endInterval:   { default: 50 },
+    mode:          { default: 'each' },    // 'each' ou 'group'
+    glow:          { default: true },      // true = ignore complètement les lumières
+    stagger:       { default: 0 },         // ms pendant lesquelles les objets s'allument un à un (0 = tous ensemble)
+    order:         { default: 'random' }   // 'random' ou 'sequence' (ordre d'écriture dans le HTML)
+  },
+
+  init: function () {
+    this.elapsed = 0;
+    this.t = 0;
+    this.groupColor = this.randomColor();
+    this.items = [];
+
+    const els = [this.el, ...this.el.querySelectorAll('*')];
+    els.forEach((el) => {
+      const mesh = el.getObject3D('mesh');
+      if (!mesh || !mesh.material) return;
+      this.items.push({ mesh: mesh, original: mesh.material, on: false, start: 0 });
+    });
+
+    // heure d'allumage de chaque objet
+    const n = this.items.length;
+    this.items.forEach((it, i) => {
+      it.start = this.data.order === 'sequence'
+        ? (i / Math.max(n - 1, 1)) * this.data.stagger
+        : Math.random() * this.data.stagger;
+    });
+
+    this.activateDue();
+  },
+
+  randomColor: function () {
+    return new THREE.Color().setHSL(Math.random(), 1, 0.5);
+  },
+
+  // allume les objets dont l'heure est venue
+  activateDue: function () {
+    this.items.forEach((it) => {
+      if (it.on || this.elapsed < it.start) return;
+      it.on = true;
+      if (this.data.glow) {
+        // matériau qui ne dépend d'aucune lumière ni du brouillard
+        it.temp = new THREE.MeshBasicMaterial({ fog: false });
+        it.mesh.material = it.temp;
+      } else {
+        it.color = it.original.color.clone();
+        it.map = it.original.map;
+        it.original.map = null;
+        it.original.needsUpdate = true;
+      }
+      (it.temp || it.original).color.copy(
+        this.data.mode === 'group' ? this.groupColor : this.randomColor()
+      );
+    });
+  },
+
+  recolor: function () {
+    this.groupColor = this.randomColor();
+    this.items.forEach((it) => {
+      if (!it.on) return;   // les objets pas encore allumés restent normaux
+      const c = this.data.mode === 'group' ? this.groupColor : this.randomColor();
+      (it.temp || it.original).color.copy(c);
+    });
+  },
+
+  tick: function (time, dt) {
+    this.elapsed += dt;
+    this.t += dt;
+    this.activateDue();
+
+    const k = Math.min(this.elapsed / this.data.duration, 1);
+    const interval = this.data.startInterval + (this.data.endInterval - this.data.startInterval) * k;
+    if (this.t < interval) return;
+    this.t = 0;
+    this.recolor();
+  },
+
+  remove: function () {
+    this.items.forEach((it) => {
+      if (!it.on) return;   // jamais allumé : rien à remettre
+      if (it.temp) {
+        it.mesh.material = it.original;
+        it.temp.dispose();
+      } else {
+        it.original.color.copy(it.color);
+        it.original.map = it.map;
+        it.original.needsUpdate = true;
+      }
+    });
+  }
+});
+
+AFRAME.registerComponent('disintegrate', {
+  schema: {
+    count:   { default: 400 },    // nombre total de cubes
+    size:    { default: 0.04 },   // taille d'un cube (m)
+    delay:   { default: 3000 },   // les morceaux se brisent entre 0 et delay (ms)
+    order:   { default: 'top' },  // 'top' = de haut en bas, 'random' = au hasard
+    gravity: { default: 4 },
+    spread:  { default: 0.5 },    // force de l'éjection
+    linger:  { default: 1500 },   // ms passées au sol avant de disparaître
+    floor:   { default: 0 },      // hauteur du sol
+    glow:    { default: false }   // true = cubes visibles même dans le noir
+  },
+
+  init: function () {
+    const d = this.data;
+    this.t = 0;
+    this.finished = false;
+    this.dummy = new THREE.Object3D();
+    this.pieces = [];
+    this.cubes = [];
+
+    // 1. les morceaux = tous les objets visibles du groupe
+    this.el.object3D.updateMatrixWorld(true);
+    const box = new THREE.Box3(), sz = new THREE.Vector3();
+    this.el.object3D.traverse((o) => {
+      if (!o.isMesh || !o.geometry || !o.visible || Array.isArray(o.material)) return;
+      box.setFromObject(o);
+      box.getSize(sz);
+      this.pieces.push({
+        mesh: o, hidden: false, start: 0,
+        w: sz.x * sz.y + sz.y * sz.z + sz.x * sz.z + 1e-6,   // surface (pour répartir les cubes)
+        top: box.max.y
+      });
+    });
+    if (!this.pieces.length) { this.finished = true; return; }
+
+    // 2. quand chaque morceau se brise
+    const tops = this.pieces.map((p) => p.top);
+    const hi = Math.max(...tops), lo = Math.min(...tops);
+    this.pieces.forEach((p) => {
+      p.start = d.order === 'top'
+        ? ((hi - p.top) / ((hi - lo) || 1)) * d.delay
+        : Math.random() * d.delay;
+    });
+
+    // 3. échantillonnage de la couleur d'une image (pour les posters)
+    const samplers = new Map();
+    const sample = (map, u, v) => {
+      let data = samplers.get(map);
+      if (data === undefined) {
+        try {
+          const c = document.createElement('canvas');
+          c.width = c.height = 64;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(map.image, 0, 0, 64, 64);
+          data = ctx.getImageData(0, 0, 64, 64).data;
+        } catch (e) { data = null; }   // image bloquée : on utilisera la couleur du matériau
+        samplers.set(map, data);
+      }
+      if (!data) return null;
+      const x = Math.min(63, Math.floor(u * 64));
+      const y = Math.min(63, Math.floor((1 - v) * 64));
+      const k = (y * 64 + x) * 4;
+      return 'rgb(' + data[k] + ',' + data[k + 1] + ',' + data[k + 2] + ')';
+    };
+
+    // 4. création des cubes, répartis dans chaque morceau
+    const total = this.pieces.reduce((s, p) => s + p.w, 0);
+    this.pieces.forEach((p) => {
+      const n = Math.max(3, Math.round(d.count * p.w / total));
+      const g = p.mesh.geometry;
+      if (!g.boundingBox) g.computeBoundingBox();
+      const bb = g.boundingBox;
+      const mat = p.mesh.material;
+      for (let i = 0; i < n; i++) {
+        const u = Math.random(), v = Math.random();
+        const lp = new THREE.Vector3(
+          bb.min.x + u * (bb.max.x - bb.min.x),
+          bb.min.y + v * (bb.max.y - bb.min.y),
+          bb.min.z + Math.random() * (bb.max.z - bb.min.z)
+        );
+        p.mesh.localToWorld(lp);   // position réelle dans la salle
+
+        const color = new THREE.Color(0xffffff);
+        if (mat.color) color.copy(mat.color);
+        if (mat.map) {
+          const rgb = sample(mat.map, u, v);
+          if (rgb) color.setStyle(rgb);
+        }
+
+        this.cubes.push({
+          piece: p, color: color,
+          x: lp.x, y: lp.y, z: lp.z,
+          vx: (Math.random() - 0.5) * d.spread,
+          vy: Math.random() * d.spread * 0.5,
+          vz: (Math.random() - 0.5) * d.spread,
+          s: d.size * (0.6 + Math.random() * 0.8),
+          yaw: Math.random() * Math.PI,
+          fall: p.start + Math.random() * 400,   // chaque cube lâche un peu en décalé
+          landT: -1, done: false
+        });
+      }
+    });
+
+    // 5. un seul objet pour tous les cubes
+    const m = d.glow ? new THREE.MeshBasicMaterial() : new THREE.MeshStandardMaterial({ roughness: 0.9 });
+    this.imesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, this.cubes.length);
+    this.imesh.frustumCulled = false;
+    this.cubes.forEach((c, i) => this.imesh.setColorAt(i, c.color));
+    this.imesh.instanceColor.needsUpdate = true;
+    this.el.sceneEl.object3D.add(this.imesh);
+    this.step(0);
+  },
+
+  step: function (dt) {
+    const d = this.data, s = dt / 1000, t = this.t, dm = this.dummy;
+    let alive = 0;
+
+    // l'objet d'origine disparaît au moment où son morceau se brise
+    this.pieces.forEach((p) => {
+      if (!p.hidden && t >= p.start) { p.mesh.visible = false; p.hidden = true; }
+    });
+
+    for (let i = 0; i < this.cubes.length; i++) {
+      const c = this.cubes[i];
+      let sc = 0;
+      if (!c.done) {
+        alive++;
+        if (t >= c.piece.start) {
+          sc = c.s;
+          if (t >= c.fall && c.landT < 0) {          // en chute
+            c.vy -= d.gravity * s;
+            c.x += c.vx * s; c.y += c.vy * s; c.z += c.vz * s;
+            const ground = d.floor + c.s / 2;
+            if (c.y <= ground) { c.y = ground; c.landT = t; }
+          }
+          if (c.landT >= 0) {                        // au sol, puis rétrécit
+            const k = (t - c.landT - d.linger) / 400;
+            if (k >= 1) { c.done = true; sc = 0; }
+            else if (k > 0) sc = c.s * (1 - k);
+          }
+        }
+      }
+      dm.position.set(c.x, c.y, c.z);
+      dm.rotation.set(0, c.yaw, 0);
+      dm.scale.setScalar(sc);
+      dm.updateMatrix();
+      this.imesh.setMatrixAt(i, dm.matrix);
+    }
+    this.imesh.instanceMatrix.needsUpdate = true;
+
+    if (alive === 0) {
+      this.finished = true;
+      this.imesh.visible = false;
+      this.el.emit('disintegrated');
+    }
+  },
+
+  tick: function (time, dt) {
+    if (this.finished) return;
+    this.t += dt;
+    this.step(dt);
+  },
+
+  remove: function () {
+    // removeAttribute remet l'objet d'origine
+    (this.pieces || []).forEach((p) => { p.mesh.visible = true; });
+    if (this.imesh) {
+      this.el.sceneEl.object3D.remove(this.imesh);
+      this.imesh.geometry.dispose();
+      this.imesh.material.dispose();
+    }
+  }
+});
+  </script>
+</head>
+
+
+
+
+<!-- /////////////////////////////////////////////// la scene ////////////////////////////////////////////////////// -->
+
+
+
+
+
+<body>
+  <a-scene fog="type: exponential; color: black; density: 0;">
+
+    <a-assets>
+      <img id="posterrouge" src="assets/thetuffknight.jpg">
+      <img id="posterblanc" src="assets/9to5.jpg">
+      <img id="posternoir" src="assets/thenothing.jpg">
+      <img id="postervert" src="assets/cool&relax.jpg">
+      <img id="posterMJ" src="assets/bad.jpg">
+      <img id="posterID" src="assets/imaginaldisk.jpg"> 
+      <img id="posterCP" src="assets/CP.jpg">
+      <img id="posterRDR" src="assets/rdr2.jpg">
+      <img id="posterSIMS" src="assets/sims.jpg">
+      <img id="chat" src="assets/autocollants/chat.jpg">
+      <img id="doigt" src="assets/autocollants/doigt.jpg">
+      <img id="love" src="assets/autocollants/love.jpg">
+      <img id="mox" src="assets/autocollants/mox.jpg">
+      <img id="pride" src="assets/autocollants/pride.jpg">
+      <img id="singe" src="assets/autocollants/singe.jpg">
+      <img id="smiley" src="assets/autocollants/smiley.jpg">
+      <a-mixin id="mag" geometry="width: 0.21; height: 0.03; depth: 0.28"></a-mixin>
+      <a-mixin id="com" material="color: white; src: #comic; repeat: 1 1"></a-mixin>
+      <img id="metal" src="assets/texture/metal.png">
+      <img id="dirt" src="assets/texture/dirt.png">
+      <img id="concrete1" src="assets/texture/concrete1.png">
+      <img id="concrete2" src="assets/texture/concrete2.png">
+      <img id="moquette" src="assets/texture/moquette.png">
+      <img id="pierre" src="assets/texture/pierre.png">
+      <img id="coton" src="assets/texture/coton.png">
+      <img id="plaster" src="assets/texture/plaster.png">
+      <img id="plaster2" src="assets/texture/plaster2.png">
+      <img id="comic" src="assets/texture/comic.png">
+    </a-assets>
+
+
+    <!--salle-->
+      <a-plane id="sol" position="" geometry="height: 4; width: 4" rotation="-90 0 0"  material="color: #241515 ; src: #concrete1; repeat: 2 2; shader: flat" ></a-plane>
+      <a-box id="plafond" position="0 2 0" geometry="depth: 0.07; height: 4; width: 4" rotation="-90 0 0" material="color: #C5D1E3;"></a-box>
+      <a-box id="mur1" position="2 1 0" material="color: #C7CFF0; src: #pierre; repeat: 4 4" geometry="depth: 4; height: 2; width: 0.07" color="##FD3D5ED"></a-box>
+      <a-box id="mur2" position="0 1 -2" material="color: #C7CFF0; src: #pierre; repeat: 4 4" geometry="depth: 4; height: 2; width: 0.07" rotation="0 90 0" color="#FD3D5ED" ></a-box>
+      <a-box id="mur3" position="-2 1 0" material="color: #C7CFF0; src: #pierre; repeat: 4 4" geometry="depth: 4; height: 2; width: 0.07" rotation="" color="#FD3D5ED"></a-box>
+      <a-box id="mur4" position="0 1 2" material="color: #C7CFF0; src: #pierre; repeat: 4 4" geometry="depth: 4; height: 2; width: 0.07" rotation="0 90 0" color="#FD3D5ED"></a-box>
+      <a-box id="mur4-5" position="1.97439 0.06272 0.47853" geometry="depth: 4; height: 2; width: 0.07" rotation="" color="#D3D5ED" material="color: #ebebeb" scale="1 0.07727 1.21817"></a-box>
+      <a-box id="mur4-4" position="0.443 0.063 -1.97017" geometry="depth: 4; height: 2; width: 0.07" rotation="0 90 0" color="#D3D5ED" material="color: #ebebeb" scale="1 0.077 1.218"></a-box>
+      <a-box id="mur4-3" position="-1.97088 0.06272 0.34611" geometry="depth: 4; height: 2; width: 0.07" rotation="" color="#D3D5ED" material="color: #ebebeb" scale="1 0.07727 1.21817"></a-box>
+      <a-box id="mur4-2" position="0.41264 0.06272 1.98061" geometry="depth: 4; height: 2; width: 0.07" rotation="0 90 0" color="#D3D5ED" material="color: #ebebeb" scale="1 0.07727 0.59274"></a-box>
+      <a-box id="mur4-5" position="1.97439 0.06272 0.47853" geometry="depth: 4; height: 2; width: 0.07" rotation="" color="#D3D5ED" material="color: #ebebeb" scale="1 0.07727 1.21817"></a-box>
+
+    <!--bureau-->
+    <a-entity id="bureau" position="0 0 -1.6"
+          glitch-clone="interval: 150; max: 10; offset: 0 0.2 -0.1; active: false">
+      
+      <!-- plateau -->
+      <a-box position="0 0.75 0" width="1.4" height="0.05" depth="0.7" material="src:#metal; repeat: 4 4"></a-box>
+      
+      <!-- pieds du bureau -->
+      <a-box position="-0.65 0.375 -0.3" width="0.06" height="0.75" depth="0.06" color="black"></a-box>
+      <a-box position="0.65 0.375 -0.3" width="0.06" height="0.75" depth="0.06" color="black"></a-box>
+      <a-box position="-0.65 0.375 0.3" width="0.06" height="0.75" depth="0.06" color="black"></a-box>
+      <a-box position="0.65 0.375 0.3" width="0.06" height="0.75" depth="0.06" color="black"></a-box>
+      
+      <!-- oridnateur ecran-->
+      <a-box position="0 1 -0.1" width="0.5" height="0.4" depth="0.4" color="black"></a-box>
+      <a-plane id="ecran" position="0 1 0.101" width="0.4" height="0.3" material="color: #0a2a6b; emissive: #white; emissiveIntensity: 2"></a-plane>
+      <a-plane id="ecran2" position="0 1 0.11789" width="0.5" height="0.4" material="opacity: 0.44; shader: flat; color: #ffffff" geometry="height: 0.32; width: 0.42"></a-plane>
+
+      <!-- clavier -->
+      <a-box position="0 0.785 0.2" width="0.45" height="0.02" depth="0.15" color="black"></a-box>
+    </a-entity>
+
+    <!--décorations bureau-->
+    <a-entity id="deco_bureau">
+      <a-entity id="mouchoirs">
+      <a-box material="color: #94e3fe" position="0.56653 0.81981 -1.71556" scale="0.21177 0.08149 0.10409" rotation="0 -24.489 0"></a-box>
+      <a-box material="color: #94e3fe" position="0.56653 0.82978 -1.71556" scale="0.2193 0.06784 0.10409" rotation="0 -24.489 0"></a-box>
+      <a-box material="" position="0.5258 0.85668 -1.73803" scale="0.07407 0.08149 0.00944" rotation="0 -47.037 0"></a-box>
+      <a-box material="" position="0.57937 0.85889 -1.71134" scale="0.05842 0.08149 0.00944" rotation="0 -2.724 6.204"></a-box>
+      <a-box material="" position="0.61612 0.86304 -1.68033" scale="0.05842 0.08149 0.00944" rotation="5.676 -68.834 2.508"></a-box>
+      </a-entity>
+      <a-entity id="nourriture">
+        <a-box material="color: #d95000" geometry="depth: 0.11; height: 0.13; width: 0.11" position="-0.43208 0.7967 -1.53052" rotation="0 22.26284 0" scale="0.93147 0.3857 1"></a-box>
+        <a-box material="color: #d95000" geometry="depth: 0.11; height: 0.13; width: 0.11" position="-0.41111 0.81633 -1.50091" rotation="-10.357 8.304 -6.371" scale="0.69576 0.3857 1"></a-box>
+        <a-box material="color: #d95000" geometry="depth: 0.11; height: 0.13; width: 0.11" position="-0.41265 0.78765 -1.48783" rotation="-27.9500 10.4948 -3.3563" scale="0.77929 0.3857 1"></a-box>
+        <a-box material="color: #d95000" geometry="depth: 0.04; height: 0.12; width: 0.11" position="-0.45355 0.81019 -1.45664" rotation="-25.866 -21.578 11.469" scale="0.29569 0.46909 1"></a-box>
+        <a-box material="color: #d95000" geometry="depth: 0.04; height: 0.12; width: 0.11" position="-0.36242 0.80633 -1.46155" rotation="-13.4627 -60.042 24.93856099086421" scale="0.29569 0.46909 0.65071"></a-box>
+        <a-box material="color: #000000" geometry="depth: 0.11; height: 0.13; width: 0.11" position="-0.412 0.795 -1.49" rotation="-24.575000000000003 9.861 1.35" scale="0.685 0.355 1" id="interieursachet"></a-box>
+        <a-box material="color: #d95000" geometry="depth: 0.11; height: 0.13; width: 0.11" position="-0.3961 0.79608 -1.53495" rotation="0 3.787251025814742 0" scale="0.84715 0.36708 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.38069 0.79675 -1.43586" rotation="0 3.787251025814742 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.4068 0.77583 -1.38724" rotation="0 3.787251025814742 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.36293 0.77583 -1.41856" rotation="0 35.79553825079818 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.40176 0.77583 -1.42054" rotation="0 35.79553825079818 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.34331 0.77583 -1.34501" rotation="0 35.79553825079818 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.42543 0.77583 -1.3574" rotation="0 4.288016138759081 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.28115 0.77583 -1.28605" rotation="0 4.288016138759081 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="0.07876 0.77583 -1.27657" rotation="0 4.288016138759081 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="0.02757 0.77583 -1.30151" rotation="0 -25.427293990110805 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="0.09663 0.79403 -1.34644" rotation="0 -25.427293990110805 0" scale="0.84715 0.24703 1"></a-box>
+        <a-box material="color: #ffd877" geometry="depth: 0.01; height: 0.02; width: 0.01" position="-0.39434 0.79764 -1.43731" rotation="0 3.787251025814742 0" scale="0.84715 0.24703 1"></a-box>
+      </a-entity>
+    </a-entity>
+
+    <!--chaise-->
+    <a-entity id="chaise" position="0 0 0"
+      glitch-clone="interval: 100; max: 15; offset: -0.2 0 0; active: false">
+      <a-box color="black" geometry="depth: 0.05; height: 0.45; width: 0.04" position="-0.13 0.22673 -1.1703" id="pied1"> </a-box>
+      <a-box color="black"  geometry="depth: 0.05; height: 0.45; width: 0.04" position="0.13 0.22673 -1.17" id="pied2"> </a-box>
+      <a-box color="black"  geometry="depth: 0.05; height: 0.45; width: 0.04" position="0.13 0.22673 -0.9" id="pied3"> </a-box>
+      <a-box color="black"  geometry="depth: 0.05; height: 0.45; width: 0.04" position="-0.13 0.22673 -0.9" id="pied4"> </a-box>
+      <a-box material="color: grey; src: #coton; repeat: 2 2"  geometry="depth: 0.34; height: 0.06; width: 0.34" position="0.00014 0.42576 -1.03549" id="assise"> </a-box>
+      <a-box material="color: grey; src: #coton; repeat: 2 2"  geometry="depth: 0.34; height: 0.06; width: 0.34" position="0.00014 0.62179 -0.90101" id="dossier" rotation="90 0 0"> </a-box>
+    </a-entity>
+
+    <!--posters-->
+    <a-entity id="posters-fond">
+      <a-plane src="#posterID" position="-1.2008 1.20473 -1.95614" width="0.6" height="0.8"></a-plane>
+      <a-plane src="#postervert" position="1.22229 1.20473 -1.95614" width="0.6" height="0.8" rotation="0 0 -1.95"></a-plane>
+      <a-plane src="#posterMJ" position="0.11146 1.45174 -1.95614" width="0.6" height="0.8" scale="0.41 0.42 1"></a-plane>
+      <a-plane src="#posterCP" position="-0.1808 1.42266 -1.95614" width="0.6" height="0.8" scale="0.39 0.36 1" rotation="0 0 -2.47"></a-plane>
+      <a-plane src="#posterrouge" position="1.68788 1.14471 -1.95614" width="0.6" height="0.8" scale="0.39 0.36 1" rotation="0 0 2.79"></a-plane>
+      <a-plane src="#posterblanc" position="-0.66302 0.97452 -1.95614" width="0.6" height="0.8" scale="0.39 0.36 1" rotation="0 0 1.72"></a-plane>
+      <a-plane src="#posterID" position="0.74042 1.05574 -1.95614" width="0.6" height="0.8" scale="0.41 0.42 1"></a-plane>
+      <a-plane src="#posterRDR" position="0.58449 1.50493 -1.95614" width="0.6" height="0.8" scale="0.96 0.4 1" rotation="0 0 1.22"></a-plane>
+      <a-plane src="#posterCP" position="-1.73913 1.34414 -1.95614" width="0.6" height="0.8" scale="0.42 0.42 1"></a-plane>
+      <a-plane src="#posterSIMS" position="-0.64201 1.42161 -1.95614" width="0.6" height="0.8" scale="0.64 0.34 1"></a-plane>
+      <a-plane src="#posternoir" position="-1.76464 1.01073 -1.95614" width="0.6" height="0.8" scale="0.64 0.34 1"></a-plane>
+      <a-plane src="#postervert" position="0.4607 1.21738 -1.95614" width="0.6" height="0.8" scale="0.33 0.19 1" rotation="0 0 -0.15"></a-plane>
+      <a-plane src="#posterrouge" position="0.94815 0.69229 -1.95614" width="0.6" height="0.8" scale="0.33 0.19 1" rotation="0 0 -0.15"></a-plane>
+      <a-plane src="#posterrouge" position="-0.44797 1.69471 -1.95614" width="0.6" height="0.8" scale="0.33 0.19 1" rotation="0 0 2.54"></a-plane>
+      <a-plane src="#posterCP" position="0.4607 1.04316 -1.95614" width="0.6" height="0.8" scale="0.33 0.19 1" rotation="0 0 -1.32"></a-plane>
+      <a-plane src="#mox" position="0.45785 0.89163 -1.95614" width="0.6" height="0.8" scale="0.15 0.12 1" rotation="0 0 -4.92"></a-plane>
+      <a-plane src="#smiley" position="-0.45267 0.96506 -1.95614" width="0.6" height="0.8" scale="0.15 0.12 1" rotation="0 0 4.09"></a-plane>
+      <a-plane src="#chat" position="-0.43066 1.11108 -1.95614" width="0.6" height="0.8" scale="0.15 0.12 1" rotation="0 0 4.09"></a-plane>
+      <a-plane src="#singe" position="-0.08317 1.65335 -1.95614" width="0.6" height="0.8" scale="0.15 0.12 1" rotation="0 0 4.09"></a-plane>
+      <a-plane src="#love" position="-0.33972 1.02753 -1.95614" width="0.6" height="0.8" scale="0.15 0.12 1" rotation="0 0 -12.040000000000001"></a-plane>
+      <a-plane src="#mox" scale="0.17469 0.20907 1" position="-1.55538 0.65558 -1.94969"></a-plane>
+      <a-plane src="#singe" scale="0.17469 0.20907 1" position="-1.32139 0.58958 -1.94969" rotation="0 0 -7.782485731261972"></a-plane>
+      <a-plane src="#smiley" scale="0.17469 0.20907 1" position="1.51838 0.61506 -1.94969" rotation="0 0 1.7188733853924696"></a-plane>
+      <a-plane src="#chat" scale="0.17469 0.20907 1" position="1.73608 0.72059 -1.94969" rotation="0 0 1.7188733853924696"></a-plane>
+      <a-plane src="#chat" scale="0.07387 0.06741 1" position="1.62875 1.67407 -1.94969" rotation="0 0 1.7188733853924696"></a-plane>
+      <a-plane src="#doigt" scale="0.07387 0.06741 1" position="1.7 1.64257 -1.94969" rotation="0 0 1.7188733853924696"></a-plane>
+      <a-plane src="#love" scale="0.07387 0.06741 1" position="0.88966 1.72298 -1.94969" rotation="0 0 1.7188733853924696"></a-plane>
+      <a-plane src="#mox" scale="0.07387 0.06741 1" position="-0.81305 1.65546 -1.94969" rotation="0 0 19.581405606391016"></a-plane>
+      <a-plane src="#pride" scale="0.07387 0.06741 1" position="-0.99216 0.71673 -1.94969" rotation="0 0 -2.9387005312259924"></a-plane>
+      <a-plane src="#singe" scale="0.07387 0.06741 1" position="-0.84491 0.79264 -1.94969" rotation="0 0 -2.9387005312259924"></a-plane>   
+    </a-entity>
+
+    <a-entity id="posters-fond2" visible="" position="-1.95357 0.94329 -1.10523" rotation="0 90 0">
+      <a-plane src="#posterMJ" scale="0.83281 1.16211 1" position="-0.08986 -0.11406 0"></a-plane>
+      <a-plane src="#posterRDR" scale="0.32385 0.20042 1" position="0.08789 0.61248 0" rotation="0 0 -5.56"></a-plane>
+      <a-plane src="#posterrouge" scale="0.16912 0.20042 1" position="-0.20732 0.60691 0" rotation="0 0 0.586"></a-plane>
+      <a-plane src="#pride" scale="0.12635 0.15456 1" position="-0.43505 0.63842 0" rotation="0 0 -7.553"></a-plane>
+      <a-plane src="#mox" scale="0.12635 0.15456 1" position="-1.29552 0.75252 0" rotation="0 0 5.610"></a-plane>
+      <a-plane src="#chat" scale="0.12635 0.15456 1" position="-1.50243 0.61775 0" rotation="0 0 -2.654"></a-plane>
+      <a-plane src="#posternoir" scale="0.2 0.15456 1" position="-1.67835 0.77024 0" rotation="0 0 0"></a-plane>
+      <a-plane src="#singe" scale="0.12635 0.15456 1" position="-1.45909 0.83103 0" rotation="0 0 -2.6545"></a-plane>
+      <a-plane src="#chat" scale="0.05875 0.05767 1" position="-0.7699 0.59046 0" rotation="0 0 -2.65"></a-plane>
+      <a-plane src="#pride" scale="0.05875 0.05767 1" position="-1.01217 0.64492 0" rotation="0 0 0.9671"></a-plane>
+      <a-plane src="#love" scale="0.05875 0.05767 1" position="-0.92049 0.02006 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#doigt" scale="0.05875 0.05767 1" position="-0.66907 -0.13406 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#mox" scale="0.05875 0.05767 1" position="0.34638 0.51959 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#smiley" scale="0.05875 0.05767 1" position="-1.89617 0.70796 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#singe" scale="0.05875 0.05767 1" position="-1.56166 -0.02528 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#chat" scale="0.05875 0.05767 1" position="-1.66693 -0.06989 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#pride" scale="0.05875 0.05767 1" position="-0.69639 -0.28 0.13695" rotation="0 0 0.9671"></a-plane>
+      <a-plane src="#love" scale="0.06135 0.05745 1" position="-0.69402 0.64186 0" rotation="0 0 -2.654"></a-plane>
+      <a-plane src="#posterCP" scale="0.29561 0.39459 1" position="-0.72887 0.30487 0" rotation="0 0 -0.6405"></a-plane>
+      <a-plane src="#postervert" scale="0.29561 0.39459 1" position="-1.07111 0.37399 0" rotation="0 0 -0.640"></a-plane>
+      <a-plane src="#posterblanc" scale="0.29561 0.39459 1" position="-1.4626 0.25496 0" rotation="0 0 3.5821"></a-plane>
+      <a-plane src="#chat" scale="0.29561 0.39459 1" position="0.54609 0.10155 0" rotation="0 0 3.582"></a-plane>
+      <a-plane src="#posterSIMS" scale="1.1183 0.7618 1" position="-2.31427 0.25039 0" rotation="0 0 0.8548"></a-plane>  
+    </a-entity>
+
+    <a-entity id="posters-fond3" visible="" position="1.94408 0.943 1.00073" rotation="0 -90 0">
+      <a-plane src="#postervert" scale="0.6257 0.84026 1" position="0.39307 0.25137 0"></a-plane>
+      <a-plane src="#posterCP" scale="0.6257 0.84026 1" position="-0.28052 0.23455 0"></a-plane>
+      <a-plane src="#chat" scale="0.12635 0.15456 1" position="-0.63713 0.1809 0.01667" rotation="0 0 5.61"></a-plane>
+      <a-plane src="#smiley" scale="0.12635 0.15456 1" position="-0.19227 -0.18697 0.01643" rotation="0 0 -2.654"></a-plane>
+      <a-plane src="#posterRDR" scale="0.12635 0.15456 1" position="-2.17935 0.73619 0" rotation="0 0 0"></a-plane>
+      <a-plane src="#singe" scale="0.12635 0.15456 1" position="-1.95587 0.75786 0" rotation="0 0 -2.6545"></a-plane>
+      <a-plane src="smiley" scale="0.05875 0.05767 1" position="-0.83345 0.5934 0" rotation="0 0 -2.6500000000000004"></a-plane>
+      <a-plane src="#mox" scale="0.05875 0.05767 1" position="-1.01217 0.64492 0" rotation="0 0 0.9671"></a-plane>
+      <a-plane src="#chat" scale="0.05875 0.05767 1" position="-2.3 -0.2358 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#doigt" scale="0.05875 0.05767 1" position="-2.54726 -0.26868 0" rotation="0 0 0.967"></a-plane>      
+      <a-plane src="#pride" scale="0.05875 0.05767 1" position="-1.83947 -0.038 0.02713" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#love" scale="0.05875 0.05767 1" position="-1.75711 -0.12216 0.04032" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#singe" scale="0.05875 0.05767 1" position="-1.96827 -0.19199 0" rotation="0 0 0.967"></a-plane>
+      <a-plane src="#smiley" scale="0.05875 0.05767 1" position="-2.61 -0.25 0" rotation="0 0 0.9671"></a-plane>
+      <a-plane src="#chat" scale="0.06135 0.05745 1" position="-0.94684 0.56424 0.02301" rotation="0 0 -2.654"></a-plane>
+      <a-plane src="#love" scale="0.29561 0.39459 1" position="-1.28234 -0.04288 0" rotation="0 0 -0.6405"></a-plane>
+      <a-plane src="#posterID" scale="0.296 0.395 1" position="-0.88274 -0.121 0" rotation="0 0 -0.64"></a-plane>
+      <a-plane src="#posterrouge" scale="0.29561 0.39459 1" position="-1.03158 0.37399 0" rotation="0 0 -0.64"></a-plane>
+      <a-plane src="#posterblanc" scale="0.29561 0.39459 1" position="-1.4626 0.41633 0" rotation="0 0 3.5820999999999996"></a-plane>
+      <a-plane src="#posternoir" scale="1.1183 0.7618 1" position="-2.31427 0.25039 0" rotation="0 0 0.8548"></a-plane> 
+    </a-entity>
+    
+    <!--piles de magazines-->
+    <a-entity id="piles-magazines">
+      <!-- pile 1 -->
+      <a-box mixin="mag" position="-0.90449 0.015 -1.62435" rotation="0 -22.55 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag com" position="-0.89526 0.045 -1.62052" rotation="0 -18.55 0" ></a-box>
+      <a-box mixin="mag" position="-0.91756 0.075 -1.61895" rotation="0 -28.55 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag com" position="-0.89142 0.105 -1.62975" rotation="0 -14.55 0" color="#e8c547"></a-box>
+      <a-box mixin="mag com" position="-0.90833 0.135 -1.61512" rotation="0 -25.55 0" ></a-box>
+      <a-box mixin="mag" position="-0.904 0.165 -1.62415" rotation="0 -15.549999999999999 0" color="#3b82c4"></a-box>
+      <a-box mixin="mag com" position="-0.89909 0.195 -1.61128" rotation="0 -27.55 0" color="darkred"></a-box>
+      <a-box mixin="mag" position="-0.90449 0.225 -1.62435" rotation="0 -19.55 0" color="grey"></a-box>
+      <!-- pile 2 -->
+      <a-box mixin="mag com" position="-0.91503 0.26039 -1.62528" rotation="0 90 0" color="orange"></a-box>
+      <a-box mixin="mag" position="-0.91503 0.29039 -1.63528" rotation="0 94 0" color="#d94a4a"></a-box>
+      <a-box mixin="mag" position="-0.90503 0.32039 -1.61528" rotation="0 84 0" color="lightblue"></a-box>
+      <a-box mixin="mag com" position="-0.92503 0.35039 -1.63528" rotation="0 98 0" color="#e8c547"></a-box>
+      <a-box mixin="mag" position="-0.90503 0.38039 -1.62528" rotation="0 87 0" color="orange"></a-box>
+      <a-box mixin="mag" position="-0.91503 0.41039 -1.61528" rotation="0 97 0" color="#3b82c4"></a-box>
+      <a-box mixin="mag com" position="-0.90503 0.44039 -1.63528" rotation="0 85 0" color="darkorange"></a-box>
+      <a-box mixin="mag com" position="-0.91503 0.47039 -1.62528" rotation="0 34.29 0" color="turquoise"></a-box>
+      <!-- pile 3 -->
+      <a-box mixin="mag com" position="-1.22556 0.01912 -1.44404" rotation="0 40.32 0" ></a-box>
+      <a-box mixin="mag" position="-1.21794 0.04912 -1.45051" rotation="0 44.32000000000001 0" color="#d94a4a"></a-box>
+      <a-box mixin="mag com" position="-1.22671 0.07912 -1.42995" rotation="0 34.32 0"></a-box>
+      <a-box mixin="mag com" position="-1.22441 0.10912 -1.45814" rotation="0 48.32 0" ></a-box>
+      <a-box mixin="mag" position="-1.21909 0.13912 -1.43642" rotation="0 37.32 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag" position="-1.23318 0.16912 -1.43757" rotation="0 47.32 0" color="#3b82c4"></a-box>
+      <a-box mixin="mag com" position="-1.21147 0.19912 -1.44289" rotation="0 35.32000000000001 0"></a-box>
+      <a-box mixin="mag com" position="-1.22556 0.22912 -1.44404" rotation="0 -15.39 0" color="lightgreen"></a-box>
+      
+      <a-box id="mag" position="-0.9619 0.014 -1.244" rotation="0 -55.71 0" mixin="mag com" color="orange"></a-box>
+      <a-box position="-1.71556 0.014 0.59875" rotation="0 -55.71 0" mixin="mag com" id="mag"></a-box>
+      <a-box position="-1.8473 0.74414 0.40527" rotation="0 -0.4979003239686854 0" mixin="mag com"  id="mag" color="orange"></a-box>
+      <a-box mixin="com" position="-1.82503 0.77616 0.40527" rotation="0 15.182808613171686 0" width="0.21" height="0.03" depth="0.28" color="lightblue" id="mag"></a-box>
+      <a-box position="-0.34816 0.6072 1.08665" rotation="0 6.818770719851927 0" width="0.21" height="0.03" depth="0.28" color="#e8789a" material="color: #ff4013" scale="1 0.37071 1" id="mag"></a-box>
+      <a-box position="-0.24318 0.6072 1.0741" rotation="0 7.142491874100843 0" width="0.21" height="0.03" depth="0.28" color="#e8789a" material="color: #831100" scale="0.11183 0.38046 1.04108" id="mag"></a-box>
+      <a-box position="-0.34983 0.60982 1.08685" rotation="0 6.818770719851927 0" width="0.21" height="0.03" depth="0.28" color="#e8789a" material="color: #ffffff" scale="0.89771 0.37071 0.96213" id="mag"></a-box>
+      <a-box position="-0.13472 0.60887 1.05769" rotation="-0.11688339020668795 6.793560576866171 -4.788781251703422" width="0.21" height="0.03" depth="0.28" color="#e8789a" material="color: #ff4013" scale="1 0.2759 1" id="mag"></a-box>
+      <a-box position="-0.13323 0.61708 1.05587" rotation="0 7.282293576112763 -4.627207153476529" width="0.21" height="0.03" depth="0.28" color="#e8789a" material="color: #ffffff" scale="0.9729 0.4698 0.97816" id="mag"></a-box>
+    </a-entity>
+    <a-entity id="piles-magazines2" position="0.17597 0 -3.12971" rotation="0 173 0">
+      <!-- pile 1 -->
+      <a-box mixin="mag com" position="-0.90449 0.015 -1.62435" rotation="0 -22.55 0" ></a-box>
+      <a-box mixin="mag com" position="-0.89526 0.045 -1.62052" rotation="0 -18.55 0" color="#d94a4a"></a-box>
+      <a-box mixin="mag" position="-0.91756 0.075 -1.61895" rotation="0 -28.55 0" color="darkorange"></a-box>
+      <a-box mixin="mag com" position="-0.89142 0.105 -1.62975" rotation="0 -14.55 0" color="#e8c547"></a-box>
+      <a-box mixin="mag" position="-0.90833 0.135 -1.61512" rotation="0 -25.55 0" color="lightred"></a-box>
+      <a-box mixin="mag com" position="-0.904 0.165 -1.62415" rotation="0 -15.549999999999999 0"></a-box>
+      <a-box mixin="mag com" position="-0.89909 0.195 -1.61128" rotation="0 -27.55 0" color="red"></a-box>
+      <a-box mixin="mag" position="-0.90449 0.225 -1.62435" rotation="0 -19.55 0" color="#e8789a"></a-box>
+      <!-- pile 2 -->
+      <a-box mixin="mag com" position="-0.91503 0.26039 -1.62528" rotation="0 90 0" ></a-box>
+      <a-box mixin="mag com" position="-0.91503 0.29039 -1.63528" rotation="0 94 0" color="#d94a4a"></a-box>
+      <a-box mixin="mag" position="-0.90503 0.32039 -1.61528" rotation="0 84 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag com" position="-0.92503 0.35039 -1.63528" rotation="0 98 0" color="#e8c547"></a-box>
+      <a-box mixin="mag" position="-0.90503 0.38039 -1.62528" rotation="0 87 0" color="orange"></a-box>
+      <a-box mixin="mag com" position="-0.91503 0.41039 -1.61528" rotation="0 97 0" color="#3b82c4"></a-box>
+      <a-box mixin="mag com" position="-0.90503 0.44039 -1.63528" rotation="0 85 0" ></a-box>
+      <a-box mixin="mag com" position="-0.915 0.47 -1.625" rotation="0 34.29 0" color="#e8789a"></a-box>
+      <!-- pile 3 -->
+      <a-box mixin="mag com" position="-1.22556 0.01912 -1.44404" rotation="0 40.32 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag" position="-1.21794 0.04912 -1.45051" rotation="0 44.32000000000001 0" color="#d94a4a"></a-box>
+      <a-box mixin="mag" position="-1.22671 0.07912 -1.42995" rotation="0 34.32 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag com" position="-1.22441 0.10912 -1.45814" rotation="0 48.32 0" color="#e8c547"></a-box>
+      <a-box mixin="mag com" position="-1.21909 0.13912 -1.43642" rotation="0 37.32 0" color="#f2efe6"></a-box>
+      <a-box mixin="mag" position="-1.23318 0.16912 -1.43757" rotation="0 47.32 0" color="#3b82c4"></a-box>
+      <a-box mixin="mag com" position="-1.21147 0.19912 -1.44289" rotation="0 35.32000000000001 0" color="#blue"></a-box>
+      <a-box mixin="mag com" position="-1.22556 0.22912 -1.44404" rotation="0 -15.39 0" color="yellow"></a-box>
+      <a-box mixin="com" position="-0.96332 0.01448 -1.24439" rotation="0 -55.71 0" width="0.21" height="0.03" depth="0.28" color="yellow"></a-box>
+      <a-box mixin="com" position="-0.963 0.014 -1.244" rotation="0 -55.71 0" width="0.21" height="0.03" depth="0.28" color="lightblue"></a-box>
+      <a-box mixin="com" position="1.38097 0.014 -1.53456" rotation="0 -100.65 0" width="0.21" height="0.03" depth="0.28" color="lightblue"></a-box>
+      <a-box mixin="com" position="-0.43883 0.12956 -1.21654" rotation="-59.99999999999999 0 0" width="0.21" height="0.03" depth="0.28" color="lightgreen"></a-box>
+      <a-box mixin="com" position="-0.96924 0.12956 -1.84527" rotation="-59.99999999999999 20 0" width="0.21" height="0.03" depth="0.28" color="darkorange"></a-box>
+    </a-entity>
+
+
+    <!--tour pc-->
+    <a-entity id="tour">
+      <a-box position="-0.42449 0.18606 -1.57909" width="0.5" height="0.4" depth="0.4" color="black" geometry="depth: 0.43; height: 0.41; width: 0.22"></a-box>
+      <a-box id="boutons1" position="-0.48245 0.18606 -1.3653" width="0.5" height="0.4" depth="0.4" color="black" geometry="depth: 0.01; height: 0.29; width: 0.06" material="color: #444444"></a-box>
+      <a-box id="boutons2" position="-0.44133 0.18606 -1.3653" width="0.5" height="0.4" depth="0.4" color="black" geometry="depth: 0.01; height: 0.29; width: 0.01" material="color: #444444"></a-box>
+      <a-box id="boutons3" position="-0.35739 0.29992 -1.3653" width="0.5" height="0.4" depth="0.4" color="black" geometry="depth: 0.01; height: 0.04; width: 0.02" material="color: #444444"></a-box>
+      <a-box id="boutons4" position="-0.35739 0.26092 -1.3653" width="0.5" height="0.4" depth="0.4" color="black" geometry="depth: 0.01; height: 0.02; width: 0.02" material="color: #444444"></a-box>
+      <a-box id="boutons5" position="-0.35739 0.22658 -1.3653" width="0.5" height="0.4" depth="0.4" color="black" geometry="depth: 0.01; height: 0.02; width: 0.02" material="color: #444444"></a-box>
+    </a-entity>
+
+    <!--lit-->
+    <a-entity id="lit">
+      <a-box material="color: #EBA9B3; src: #concrete2; repeat: 4 2" geometry="depth: 0.99; height: 0.5; width: 1.91" position="0.5274 0.33924 1.39154" scale="1.04779 1 1" id="couette"></a-box>
+      <a-box material="color: #675c7a" geometry="depth: 0.32; height: 0.03; width: 0.12" position="0.09323 0.59893 1.39154" rotation="0 -43.64 0" id="slip"></a-box>
+      <a-box material="color: #796681" geometry="depth: 0.13; height: 0.03; width: 0.12" position="0.02119 0.59893 1.31314" rotation="0 -44.89 0" id="slip"></a-box>
+      <a-box material="color: #232323" geometry="depth: 0.14; height: 0.77; width: 0.1" position="-0.56741 0.38038 0.99653" id="armature"></a-box>
+      <a-box material="color: #232323" geometry="depth: 0.14; height: 0.77; width: 0.1" position="1.81499 0.38038 0.99653" id="armature"></a-box>
+      <a-box material="color: #232323" geometry="depth: 0.14; height: 0.77; width: 0.1" position="-0.56736 0.38038 1.78622" id="armature"></a-box>
+      <a-box material="color: #232323" geometry="depth: 0.14; height: 0.77; width: 0.1" position="1.8191 0.38038 1.78622" id="armature"></a-box>
+      <a-box material="color: #ffffff" geometry="depth: 0.69; height: 0.67; width: 0.1" position="-0.567 0.38 1.385" id="armature" scale="1 1 0.92713"></a-box>
+      <a-box material="color: #ffffff" geometry="depth: 0.69; height: 0.52; width: 0.1" position="1.81406 0.45035 1.3847" id="armature" scale="1 1 0.92119"></a-box>
+      <a-box material="color: lightblue; src: #plaster2" geometry="depth: 0.69; height: 0.15; width: 0.25" position="1.55481 0.57241 1.29334" rotation="-1.1500000000000001 -6.09 -7.369999999999999" id="coussin"></a-box>
+      <a-box material="color: #ff7a6b; src: #plaster" geometry="depth: 0.49; height: 0.09; width: 0.25" position="1.46638 0.70153 1.81806" rotation="-10.29 -90 75" id="coussin2"></a-box>
+      <a-box material="color: #ffb676; src: #plaster2" geometry="depth: 0.45; height: 0.18; width: 0.46" position="0.84504 0.65915 1.80415" rotation="-0.45 -89.07 71.84" id="coussin3"></a-box>
+      <a-box material="color: #999eff; src: #plaster" geometry="depth: 0.45; height: 0.18; width: 0.46" position="0.37099 0.67772 1.73021" rotation="5.45 -45.56 92.74" scale="0.53 1.82 0.64" id="coussin4"></a-box>
+      <a-box material="color: #ff6356; src: #plaster2" geometry="depth: 0.45; height: 0.18; width: 0.46" position="0.1057 0.6389 1.68391" rotation="1.8099999999999998 -37.42 54.77" scale="0.29 0.4 0.31" id="coussin5"></a-box>
+      <a-box material="color: #ff83d2; src: #plaster" geometry="depth: 0.45; height: 0.18; width: 0.46" position="0.61294 0.64861 1.62793" rotation="7.300000000000001 -99.38 62.28000000000001" scale="0.29 0.56 0.31" id="coussin6"></a-box>
+      <a-box material="color: #fff0e3" geometry="depth: 0.93; height: 0.45; width: 2.28" position="0.62202 0.33924 1.39154" id="matelas"></a-box>
+    </a-entity>  
+    
+    <!--porte-->
+    <a-entity id="porte">
+      <a-box material="color: #ebebeb" geometry="depth: 0.07; height: 1.63" position="-1.34648 0.8374 1.98113"></a-box>
+      <a-box material="color: #ebebeb" geometry="depth: 0.07; height: 1.77; width: 0.06" position="-0.79673 0.8374 1.98113"></a-box>
+      <a-box material="color: #ebebeb" geometry="depth: 0.07; height: 1.74; width: 0.06" position="-1.89361 0.8374 1.98113"></a-box>
+      <a-box material="color: #ebebeb" geometry="depth: 0.07; height: 1.16; width: 0.06" position="-1.34557 1.69726 1.98113" rotation="0 0 90"></a-box>
+      <a-box material="color: #9E9E9E" geometry="depth: 0.04; height: 0.03; width: 0.18" position="-0.9957 0.89033 1.89033" scale="0.97 1 1"></a-box>
+      <a-box material="color: #9E9E9E" geometry="depth: 0.04; height: 0.03; width: 0.12" position="-0.92716 0.89033 1.93768" scale="0.97 1 1" rotation="0 90 0"></a-box>
+    </a-entity>
+
+    <!--tapis-->
+    <a-entity id="tapis">
+      <a-box material="color: #070530; src: #moquette; shader:flat" geometry="depth: 1.9; height: 0.04; width: 2.13" position="0.6 0 0.827" id="tapis1"></a-box>
+    </a-entity>
+
+    <!--lampe plafond-->
+    <a-entity id="lampe_plafond" position="0 0.05 0">
+      <a-box material="" geometry="depth: 0.05; height: 0.31; width: 0.05" position="0 2.02851 0"></a-box>
+      <a-box material="" geometry="depth: 0.23; height: 0.06; width: 0.23" position="0 1.86283 0"></a-box>
+      <a-box material="color: white; emissive: white; emissiveIntensity: 0.5" geometry="depth: 0.19; height: 0.04; width: 0.19" position="0 1.84747 0" id="ampoule"></a-box>
+    </a-entity>
+    
+    <!--arbre1-->
+    <a-entity id="arbre1"
+      glitch-clone="interval: 100; max: 15; offset: 0 0 0.3; active: false">
+      <a-box material="color: #00364a" position="1.81461 0.14014 -0.4207" scale="0.23066 0.36738 0.2763" rotation="0 -11.19101165449524 0" id="pot"></a-box>
+      <a-box material="color: #553d00" position="1.8289 0.46923 -0.49292" scale="0.03892 0.36738 0.02848" rotation="0 -11.19101165449524 0" id="tronc"></a-box>
+      <a-box material="color: #553d00" position="1.80295 0.40706 -0.36175" scale="0.03256 0.36738 0.02354" rotation="0 -11.19101165449524 0" id="tronc-2"></a-box>
+      <a-box material="color:green; src: #dirt" position="1.78144 0.74286 -0.25304" scale="0.3426 0.36738 0.3186" rotation="0 -11.19101165449524 0" id="feuillage"></a-box>
+      <a-box material="color:green; src: #dirt" position="1.76975 0.61875 -0.55075" scale="0.31411 0.29493 0.25758" rotation="0 9.629701662763745 0" id="feuillage-2"></a-box>
+      <a-box material="color:green; src: #dirt" position="1.66149 0.76698 -0.43803" scale="0.24804 0.23833 0.24589" rotation="0 9.629701662763745 0" id="feuillage-3"></a-box>
+      <a-box material="color:green; src: #dirt" position="1.79284 0.82761 -0.4299" scale="0.21608 0.35911 0.33215" rotation="0 9.629701662763745 0" id="feuillage-4"></a-box>
+    </a-entity>
+
+    <!--arbre2-->
+    <a-entity id="arbre2" position="-1.93053 0 -1.88439"
+      glitch-clone="interval: 200; max: 15; offset: 0 0 0.3; active: false">
+      <a-box material="color: #3c081b" position="0.23887 0.24546 0.23001" id="pot" scale="0.17962 0.57585 0.12908" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color: #3c081b" position="0.23887 0.62568 0.23001" id="pot-2" scale="0.20061 0.2736 0.14952" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color: #583400" position="0.23608 0.66573 0.23101" id="pot-3" scale="0.19506 0.19817 0.09971" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color: #cead6f" position="0.19022 1.13434 0.23736" id="tronc2" scale="0.03156 0.89358 0.02668" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color: #cead6f" position="0.26008 1.13434 0.26563" id="tronc2-2" scale="0.01797 0.89358 0.01039" rotation="0 50.348666247121095 0"></a-box>
+      <a-box material="color: #cead6f" position="0.28108 1.13434 0.18859" id="tronc2-3" scale="0.0231 0.89358 0.02668" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.32522 1.64529 0.17278" id="feuillage2" scale="0.16943 0.169 0.1447" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.23689 1.55427 0.29314" id="feuillage2-2" scale="0.16943 0.169 0.1447" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.17804 1.58503 0.12892" id="feuillage2-3" scale="0.16943 0.169 0.1447" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.32177 1.36462 0.12997" id="feuillage2-4" scale="0.16943 0.169 0.1447" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.15232 1.28039 0.19069" id="feuillage2-5" scale="0.16943 0.169 0.1447" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.24719 1.389 0.3284" id="feuillage2-8" scale="0.11368 0.08873 0.1314" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.31494 1.12569 0.14223" id="feuillage2-10" scale="0.11368 0.08873 0.1314" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.10871 1.50967 0.21897" id="feuillage2-9" scale="0.11368 0.08873 0.1314" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.19229 1.00664 0.25469" id="feuillage2-12" scale="0.11368 0.08873 0.1314" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.10674 1.25723 0.25916" id="feuillage2-11" scale="0.11368 0.08873 0.1314" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.30745 1.19524 0.2859" id="feuillage2-6" scale="0.16943 0.169 0.1447" rotation="0 19.714331814861364 0"></a-box>
+      <a-box material="color:lightgreen; src: #dirt" position="0.14765 1.08253 0.17484" id="feuillage2-7" scale="0.16943 0.13692 0.1447" rotation="0 19.714331814861364 0"></a-box>
+    </a-entity>
+
+    <!--radiateur-->
+    <a-entity id="radiateur">
+      <a-box material="color: #c8cacd" position="-1.87331 0.14299 0.04687" scale="0.08528 0.07476 0.86488"></a-box>
+      <a-box material="color: #caccd2" position="-1.87331 0.14299 0.5219" scale="0.08528 0.07476 0.06633"></a-box>
+      <a-box material="color: #caccd2" position="-1.87331 0.64675 0.52458" scale="0.08528 0.07476 0.0554"></a-box>
+      <a-box material="color: #caccd2" position="-1.87331 0.64675 -0.43279" scale="0.08528 0.07476 0.0554"></a-box>
+      <a-box material="color: #caccd2" position="-1.87331 0.14359 -0.43279" scale="0.08528 0.07476 0.0554"></a-box>
+      <a-box material="color: #caccd2" position="-1.873 0.652 0.048" scale="0.076 0.06 0.842"></a-box>
+      <a-box material="color: #ffffff" position="-1.873 0.652 0.52065" scale="0.04048 0.03283 0.23425"></a-box>
+      <a-box material="" position="-1.967 0.652 1.319" scale="0.04 0.033 1.387"></a-box>
+      <a-box material="color: #ffffff" position="-1.96709 0.14979 1.31856" scale="0.04048 0.03283 1.38682"></a-box>
+      <a-box material="color: #ffffff" position="-1.873 0.14825 0.52065" scale="0.04048 0.03283 0.23425"></a-box>
+      <a-box material="color: #ffffff" position="-1.97913 0.14825 0.61817" scale="0.04048 0.03283 0.23425" rotation="0 90 0"></a-box>
+      <a-box material="color: #ffffff" position="-1.97913 0.65124 0.61817" scale="0.04048 0.03283 0.23425" rotation="0 90 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.20302 0.48309" scale="0.10103 0.05455 1" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.39049 -0.19104" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.39049 -0.11495" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #c2c9da" position="-1.87331 0.39049 -0.03927" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #aaafbc" position="-1.87331 0.39049 0.03593" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.39049 0.11395" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.39049 0.18944" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.39049 0.26197" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #b3b8c5" position="-1.87331 0.39049 0.33401" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #bbc1d2" position="-1.87331 0.39049 0.40857" scale="0.10103 0.05455 0.63058" rotation="90 0 0"></a-box>
+      <a-box material="color: #c9cfde" position="-1.87331 0.39069 -0.26502" scale="0.10103 0.05455 0.62149" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.39143 -0.33451" scale="0.10103 0.05455 0.62097" rotation="90 0 0"></a-box>
+      <a-box material="color: #bec3d0" position="-1.87331 0.20302 -0.399" scale="0.10865 0.05455 1" rotation="90 0 0"></a-box>
+    </a-entity>
+
+    <!--cables-->
+    <a-entity id="cables"
+      glitch-clone="interval: 250; max: 15; offset: -0.15 0 -0.5; active: false">
+      <!--cables ordi->tour pc-->
+      <a-box material="color: #232323" position="-0.42507 0.28328 -1.96311" scale="0.02243 1 0.03054"></a-box>
+      <a-box material="color: #232323" position="-0.4048 0.77445 -1.92979" scale="0.02243 0.30499 0.03054" rotation="90 31.307999999999996 0"></a-box>
+      <a-box material="color: #232323" position="-0.32771 0.81273 -1.80303" scale="0.02243 0.30499 0.03054" rotation="16.709 31.307999999999996 0"></a-box>
+      <a-box material="color: #232323" position="-0.29046 0.97525 -1.75594" scale="0.02243 0.05822 0.03054" rotation="37.027 19.0932 -31.233000000000004"></a-box>
+      <a-box material="color: #000000" position="-0.25186 0.9842 -1.75594" scale="0.0511 0.05822 0.0652" rotation="0 0 90"></a-box>
+      <a-box material="color: #000000" position="-0.25186 0.9842 -1.82849" scale="0.0511 0.05822 0.0652" rotation="0 0 90"></a-box>
+      <a-box material="color: #232323" position="-0.47096 0.77989 -1.96311" scale="0.02243 0.30499 0.03054" rotation="90.00020000000002 20.484 0"></a-box>
+      <a-box material="color: #232323" position="-0.39422 0.81734 -1.8216" scale="0.02243 0.1328 0.03054" rotation="20.226 20.484 -27.417"></a-box>
+      <a-box material="color: #232323" position="-0.32032 0.92987 -1.82425" scale="0.02243 0.15852 0.03054" rotation="7.46 27.055 -32.627"></a-box>
+      <a-box material="color: #232323" position="-0.46996 0.28328 -1.96311" scale="0.02243 1 0.03054"></a-box>
+      <a-box material="color: #232323" position="-0.42507 -0.00251 -1.88752" scale="0.02243 0.13058 0.03054" rotation="90 179.999 179.999"></a-box>
+      <a-box material="color: #232323" position="-0.47056 -0.00251 -1.88752" scale="0.02243 0.13058 0.03054" rotation="90 179.999 179.999"></a-box>
+      <a-box material="color: #232323" position="-0.42507 0.06625 -1.83124" scale="0.02243 0.13058 0.01856" rotation="0 179.999 179.999"></a-box>
+      <a-box material="color: #232323" position="-0.47004 0.06557 -1.83124" scale="0.02243 0.13058 0.01856" rotation="0 179.999 179.999"></a-box>
+      <a-box material="color: #232323" position="-0.42507 0.12225 -1.8054" scale="0.02243 0.04088 0.01856" rotation="90 179.999 179.999"></a-box>
+      <a-box material="color: #232323" position="-0.47144 0.12225 -1.8054" scale="0.02243 0.04088 0.01856" rotation="90 179.999 179.999"></a-box>
+      <!--cables muraux-->
+      <a-box material="color: #232323" position="0.17236 1.49191 -1.90601" scale="0.02186 1 0.01819"></a-box>
+
+      <a-entity id="cable_pendu1">
+      <a-box material="color: #232323" position="0.20249 1.91511 -1.90471" scale="0.02186 0.09084 0.01819" rotation="0 5.987981916912234 -136.70486512923875" id="deb_cable_pendu"></a-box>
+      <a-box material="color: #606060" position="0.33186 1.83573 -1.91828" scale="0.02186 0.21667 0.01819" rotation="0 5.987981916912234 -113.74873810952722"></a-box>
+      <a-box material="color: #7a7a7a" position="0.53269 1.79214 -1.93067" scale="0.02186 0.21667 0.01819" rotation="-0.10714310768946395 1.655848027928079 -91.41427029753258"></a-box>
+      <a-box material="color: #7a7a7a" position="0.74501 1.79127 -1.93329" scale="0.02186 0.21667 0.01819" rotation="0.1501149423242757 -0.18964903018830248 -88.61078780595747"></a-box>
+      <a-box material="color: #7a7a7a" position="0.94987 1.82712 -1.93253" scale="0.02186 0.21667 0.01819" rotation="0.1501149423242757 -0.18964903018830248 -71.9543317437093"></a-box>
+      <a-box material="color: #7a7a7a" position="1.10484 1.89574 -1.93183" scale="0.02186 0.13772 0.01819" rotation="0.1501149423242757 -0.18964903018830248 -56.06220138016566"></a-box>
+      
+      <a-box material="color: #a8c6fe" position="1.16166 1.96327 -1.93085" scale="0.02837 0.02546 0.02659" id="fin_cable_pendu"></a-box>
+      </a-entity>
+      <a-entity id="cable_pendu2" position="0.97157 0 -0.03317">
+      <a-box material="color: #7a7a7a" position="0.21316 1.91474 -1.90502" scale="0.01693 0.09607 0.018" rotation="1.232 5.86 -148.539" id="deb_cable_pendu"></a-box>
+      <a-box material="color: #7a7a7a" position="0.33201 1.83616 -1.91828" scale="0.02186 0.21667 0.01819" rotation="0 5.987981916912234 -113.74873810952722"></a-box>
+      <a-box material="color: #7a7a7a" position="0.53269 1.79214 -1.93067" scale="0.02186 0.21667 0.01819" rotation="-0.10714310768946395 1.655848027928079 -91.41427029753258"></a-box>
+      <a-box material="color: #7a7a7a" position="0.74501 1.79127 -1.93329" scale="0.02186 0.21667 0.01819" rotation="0.1501149423242757 -0.18964903018830248 -88.61078780595747"></a-box>
+      <a-box material="color: #7a7a7a" position="0.94987 1.82712 -1.93253" scale="0.02186 0.21667 0.01819" rotation="0.1501149423242757 -0.18964903018830248 -71.9543317437093"></a-box>
+      <a-box material="color: #232323" position="1.10484 1.89574 -1.93183" scale="0.02186 0.13772 0.01819" rotation="0.1501149423242757 -0.18964903018830248 -56.06220138016566"></a-box>
+      <a-box material="color: #a8c6fe" position="1.0011 1.83883 -1.92635" scale="0.02186 0.03341 0.01819" rotation="0.1822005788516018 -0.15870930925123802 -0.7878169683048819"></a-box>
+      <a-box material="color: #a8c6fe" position="1.16166 1.96327 -1.93085" scale="0.02837 0.02546 0.02659" id="fin_cable_pendu"></a-box>
+      </a-entity>
+
+      <a-box material="color: #a8c6fe" position="0.17363 1.96327 -1.90601" scale="0.02837 0.02546 0.02659"></a-box>
+      <a-box material="color: #a8c6fe" position="0.13498 1.96327 -1.90601" scale="0.02837 0.02546 0.02659"></a-box>    
+      <a-box material="color: #606060" position="0.13702 1.49191 -1.90601" scale="0.02186 1 0.01819"></a-box>
+    </a-entity>
+
+    <!--aération-->
+    <a-entity id="aeration" position="-0.005 0 1.21814">
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.01488" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.40957" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.36309" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.31426" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.26561" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.21554" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.16525" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.11315" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.81491 0.06331" scale="1 0.19672 0.02686"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.72974 0.20213" scale="1 0.40171 0.02686" rotation="90 0 0"></a-box>
+      <a-box material="color: #000000" position="2.43752 1.80942 0.20213" scale="0.96812 0.39124 0.17441" rotation="90 0 0"></a-box>
+      <a-box material="color: #7a7a7a" position="2.43752 1.89981 0.20924" scale="1 0.41267 0.02686" rotation="90 0 0"></a-box>
+    </a-entity>
+
+
+
+
+    
+
+
+    <a-box id="souris" position="0.4 0.8 -1.42" rotation="0 24 0" width="0.06" height="0.02" depth="0.09" color="black"
+           glitch-clone="interval: 100; max: 15; offset: 0 0.1 0; active: false"></a-box>
+
+    <a-sky color="black"></a-sky>
+    
+    
+    <a-entity id="rig" position="0 0 0">
+        <a-camera position="-1 1.5 1.8" wasd-controls="acceleration: 15; easing:8" fov="80" ></a-camera>
+    </a-entity>
+
+
+    <!-- base douce et sombre -->
+    <a-light type="ambient" color="#445" intensity="0.4"></a-light>
+
+    <!-- lumière chaude de bureau, au-dessus du bureau -->
+    <a-light id="lampe" type="point" color="white" intensity="0.5" distance="5" position="0 1.461 -0.005" light="decay: 2; distance: 6.52"></a-light>
+
+
+
+            
+  </a-scene>
+
+
+
+
+
+
+
+  <!--/////////////////////////////////////////////////timeline/////////////////////////////////////////////////////////-->
+
+  <script>
+    const scene = document.querySelector('a-scene');
+
+    function startTimeline() {
+      // fov augmente
+      setTimeout(() => {
+        document.querySelector('a-camera').setAttribute('animation__fov', {
+          property: 'camera.fov',
+          from: 80,
+          to: 100,
+          dur: 18000,
+          easing: 'easeInQuad'
+        });
+      }, 40000);
+
+      // fov diminue
+      setTimeout(() => {
+        document.querySelector('a-camera').setAttribute('animation__fov_inverse', {
+          property: 'camera.fov',
+          from: 100,
+          to: 80,
+          dur: 3000,
+          easing: 'easeInQuad'
+        });
+      }, 60000);
+
+      // cam descend
+      setTimeout(() => {
+        document.querySelector('#rig').setAttribute('animation__hauteur', {
+          property: 'position',
+          from: '0 0 0',
+          to: '0 -0.5 0',
+          dur: 18000,
+          easing: 'easeInOutSine'
+        });
+      }, 40000);
+
+        //cam remonte
+      setTimeout(() => {
+        document.querySelector('#rig').setAttribute('animation__remonte', {
+          property: 'position',
+          from: '0 -0.5 0',
+          to: '0 0 0',
+          dur: 3000,
+          easing: 'easeInQuad'
+        });
+      }, 60000);
+
+      //poster qui clignote de toute les couleurs
+      setTimeout(() => {
+        document.querySelector('#posters-fond')
+          .setAttribute('color-flicker', 'duration: 18000; startInterval: 900; endInterval: 30; stagger: 2000');
+      }, 37000);
+      setTimeout(() => {
+        document.querySelector('#posters-fond2')
+          .setAttribute('color-flicker', 'duration: 17000; startInterval: 900; endInterval: 30; stagger: 3000');
+      }, 38000);
+      setTimeout(() => {
+        document.querySelector('#posters-fond3')
+          .setAttribute('color-flicker', 'duration: 16000; startInterval: 900; endInterval: 30; stagger: 1000');
+      }, 39000);
+      
+
+
+      // les objets qui clignotent de toutes les couleurs
+      setTimeout(() => {
+        document.querySelector('#boutons2')
+          .setAttribute('color-flicker', 'duration: 15000; startInterval: 500; endInterval: 80; mode: each');
+      }, 34400);
+
+      setTimeout(() => {
+        document.querySelector('#boutons3')
+          .setAttribute('color-flicker', 'duration: 17000; startInterval: 500; endInterval: 80; mode: each');
+      }, 33500);
+
+      setTimeout(() => {
+        document.querySelector('#piles-magazines')
+          .setAttribute('color-flicker', 'duration: 15000; startInterval: 500; endInterval: 80; mode: each; stagger: 900');
+      }, 40000);
+
+      setTimeout(() => {
+        document.querySelector('#piles-magazines2')
+          .setAttribute('color-flicker', 'duration: 14000; startInterval: 500; endInterval: 80; mode: each; stagger: 900');
+      }, 41000);
+
+      setTimeout(() => {
+        document.querySelector('#ecran')
+          .setAttribute('color-flicker', 'duration: 22000; startInterval: 500; endInterval: 80; mode: each');
+      }, 35000);
+      setTimeout(() => {
+        document.querySelector('#ecran2')
+          .setAttribute('color-flicker', 'duration: 25000; startInterval: 500; endInterval: 80; mode: each');
+      }, 35000);
+
+
+
+      setTimeout(() => {
+        document.querySelector('#boutons1')
+          .setAttribute('color-flicker', 'duration: 26000; startInterval: 500; endInterval: 80; mode: each');
+      }, 34000);
+      //
+      
+
+      // éteindre les lumières
+      setTimeout(() => {
+        document.querySelector('#ampoule').setAttribute('material', {
+          emissiveIntensity: 0,  
+          color: 'white'      
+        });
+      }, 30000);
+      setTimeout(() => {
+        document.querySelector('#ecran2').setAttribute('material', {
+          emissiveIntensity: 0,  
+          color: 'grey'      
+        });
+      }, 30000);
+      setTimeout(() => {
+        document.querySelector('#ecran').setAttribute('material', {
+          emissiveIntensity: 0,  
+          color: 'grey'      
+        });
+      }, 30000);
+
+      setTimeout(() => {
+      document.querySelector('#lampe').setAttribute('light', { color: 'black', intensity: 0.6 });
+      }, 30000);
+
+      setTimeout(() => {
+        document.querySelector('#lampe').setAttribute('flicker', 'active', true);
+      }, 24000);
+      setTimeout(() => {
+        document.querySelector('#lampe').removeAttribute('flicker');
+      }, 30000);
+      //
+
+
+      //brouillard      
+      setTimeout(() => {
+        document.querySelector('a-scene').setAttribute('animation', {
+          property: 'fog.density',
+          from: 0,
+          to: 0.4,
+          dur: 25000,
+          easing: 'easeInQuad'
+        });
+      }, 30000);
+      //
+
+
+      //desintegration
+      setTimeout(() => {
+        document.querySelectorAll('#boutons1, #boutons2, #boutons3','#boutons4', '#boutons5').forEach((el) => {
+          el.setAttribute('disintegrate', 'count: 300; size: 0.03; delay: 2000; order: random');
+          });
+        }, 58500);
+
+      setTimeout(() => {
+        document.querySelector('#posters-fond')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 59250);
+      setTimeout(() => {
+        document.querySelector('#posters-fond2')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 59000);
+      setTimeout(() => {
+        document.querySelector('#posters-fond3')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 59500);
+
+      setTimeout(() => {
+        document.querySelector('#ecran')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 65000);
+      setTimeout(() => {
+        document.querySelector('#ecran2')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 65000);
+      setTimeout(() => {
+        document.querySelector('#piles-magazines')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 58000);
+      setTimeout(() => {
+        document.querySelector('#piles-magazines2')
+          .setAttribute('disintegrate', 'count: 500; size: 0.05; delay: 3000; order: top');
+      }, 58400);
+      //
+
+
+      //duplication
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone', 'active', true);
+      }, 44000);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone');
+      }, 46000);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone', 'active', true);
+      }, 47000);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone');
+      }, 49000);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone', 'active', true);
+      }, 50000);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone');
+      }, 52000);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone2', 'active', true);
+      }, 52500);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone2');
+      }, 54000);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone3', 'active', true);
+      }, 54500);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone3');
+      }, 55400);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone', 'active', true);
+      }, 55800);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone');
+      }, 56700);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone2', 'active', true);
+      }, 57000);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone2');
+      }, 57500);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone3', 'active', true);
+      }, 58000);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone3');
+      }, 58500);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone2', 'active', true);
+      }, 59000);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone2');
+      }, 59500);
+      setTimeout(() => {
+        document.querySelector('#bureau').setAttribute('glitch-clone', 'active', true);
+      }, 59600);
+      setTimeout(() => {
+        document.querySelector('#bureau').removeAttribute('glitch-clone');
+      }, 60000);
+      
+      
+
+
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 43000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 45000);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 46000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 47000);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 47500);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 48500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone3', 'active', true);
+      }, 49000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone3');
+      }, 49500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 50000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 50500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone2', 'active', true);
+      }, 51000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone2');
+      }, 51500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone3', 'active', true);
+      }, 51000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone3');
+      }, 51500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 52000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 52500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone3', 'active', true);
+      }, 53000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone3');
+      }, 53500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 54000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 54500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 55000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 55500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone2', 'active', true);
+      }, 56000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone2');
+      }, 56500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 57000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 57500);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone3', 'active', true);
+      }, 57800);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone3');
+      }, 58100);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 58400);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 58700);
+      setTimeout(() => {
+        document.querySelector('#chaise').setAttribute('glitch-clone', 'active', true);
+      }, 59000);
+      setTimeout(() => {
+        document.querySelector('#chaise').removeAttribute('glitch-clone');
+      }, 59200);
+
+
+
+      setTimeout(() => {
+        document.querySelector('#souris').setAttribute('glitch-clone', 'active', true);
+      }, 46000);
+      setTimeout(() => {
+        document.querySelector('#souris').removeAttribute('glitch-clone');
+      }, 50000);
+      setTimeout(() => {
+        document.querySelector('#souris').setAttribute('glitch-clone', 'active', true);
+      }, 52000);
+      setTimeout(() => {
+        document.querySelector('#souris').removeAttribute('glitch-clone');
+      }, 55000);
+
+
+
+
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone', 'active', true);
+      }, 43000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone');
+      }, 45000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 46000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 47000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone3', 'active', true);
+      }, 47500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone3');
+      }, 48500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 49000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 49500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 50000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 50500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 51000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 51500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 51000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 51500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 52000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 52500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 53000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 53500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 54000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 54500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 55000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 55500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 56000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 56500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 57000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 57500);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 57800);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 58100);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 58400);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 58700);
+      setTimeout(() => {
+        document.querySelector('#arbre1').setAttribute('glitch-clone2', 'active', true);
+      }, 59000);
+      setTimeout(() => {
+        document.querySelector('#arbre1').removeAttribute('glitch-clone2');
+      }, 59200);
+
+
+
+
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone', 'active', true);
+      }, 47000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone');
+      }, 49000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone3', 'active', true);
+      }, 50000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone3');
+      }, 52000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone3', 'active', true);
+      }, 52500);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone3');
+      }, 54000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone3', 'active', true);
+      }, 54500);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone3');
+      }, 55400);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone3', 'active', true);
+      }, 55800);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone3');
+      }, 56700);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone', 'active', true);
+      }, 57000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone');
+      }, 57500);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone2', 'active', true);
+      }, 58000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone2');
+      }, 58500);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone3', 'active', true);
+      }, 59000);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone3');
+      }, 59500);
+      setTimeout(() => {
+        document.querySelector('#arbre2').setAttribute('glitch-clone', 'active', true);
+      }, 59600);
+      setTimeout(() => {
+        document.querySelector('#arbre2').removeAttribute('glitch-clone');
+      }, 60000);
+
+
+
+
+      setTimeout(() => {
+        document.querySelector('#cables').setAttribute('glitch-clone', 'active', true);
+      }, 43300);
+      setTimeout(() => {
+        document.querySelector('#cables').removeAttribute('glitch-clone');
+      }, 45200);
+      
+      }
+
+      
+      //
+
+
+
+
+
+
+    if (scene.hasLoaded) {
+      startTimeline();
+    } else {
+      scene.addEventListener('loaded', startTimeline);
+    }
+  </script>
+</body>
+</html>
